@@ -1,0 +1,71 @@
+<ngx-spinner
+  bdColor="rgba(51,51,51,0.8)"
+  size="medium"
+  color="#fff"
+  type="ball-scale-multiple"
+>
+  <p style="font-size: 20px; color: white">Yükleniyor...</p>
+</ngx-spinner>
+<div class="mdl-card mdl-card__blank-layout-card mdl-shadow--2dp">
+  <div class="mdl-card__supporting-text color--dark-gray">
+    <div class="mdl-grid">
+      <div class="mdl-cell mdl-cell--12-col mdl-cell--4-col-phone">
+        <span class="mdl-card__title-text text-color--smooth-gray">DenetciApp Web</span>
+      </div>
+      <div class="mdl-cell mdl-cell--12-col mdl-cell--4-col-phone">
+        <span class="blank-layout-card-name text-color--white">Yönetici Girişi</span>
+        <span class="blank-layout-card-secondary-text text-color--smoke">Yönetici Paneline Ulaşmak için Giriş Yapın</span>
+      </div>
+      <form class="login-form" [formGroup]="loginForm" 
+      (ngSubmit)="signInWithEmail()" autocomplete="off" novalidate>
+        <div class="mdl-cell mdl-cell--12-col mdl-cell--4-col-phone">
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label full-size"
+               [class.is-invalid]="email.invalid && (email.dirty || email.touched)"
+               [class.is-valid]="email.valid && (email.dirty || email.touched)">
+            <input formControlName="email"
+                   pattern="{{emailPattern}}"
+                   (change)="onInputChange($event)"
+                   class="mdl-textfield__input" type="text" id="email">
+            <label class="mdl-textfield__label" for="email">Email</label>
+
+            <div *ngIf="email.invalid && (email.dirty || email.touched)">
+              <span *ngIf="email.errors.required" class="mdl-textfield__error">
+                Email zorunlu <span class="color-text--orange"> Geçerli Bir Mail Adresi Girin </span>
+              </span>
+              <span *ngIf="email.errors.pattern" class="mdl-textfield__error">
+                Email hatalı.
+              </span>
+            </div>
+          </div>
+
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label full-size"
+               [class.is-invalid]="password.invalid && (password.dirty || password.touched)"
+               [class.is-valid]="password.valid && (password.dirty || password.touched)"
+               id="forPass">
+            <input formControlName="password"
+                   (change)="onInputChange($event)"
+                   class="mdl-textfield__input" type="password" id="password">
+            <label class="mdl-textfield__label" for="password">Şifre</label>
+            <div *ngIf="password.invalid && (password.dirty || password.touched)">
+              <span *ngIf="password.errors.required" class="mdl-textfield__error">
+                Şifre zorunlu <span class="color-text--orange">Şifrenizi Girin</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="full-size color-text--red" *ngIf="error"> {{ error }}</div>
+
+          <a routerLink="/pages/forgot-password" class="blank-layout-card-link">Şifrenizi mi unuttunuz?</a>
+        </div>
+        <div class="mdl-cell mdl-cell--12-col mdl-cell--4-col-phone submit-cell">
+          <a routerLink="/pages/sign-up" class="blank-layout-card-link">Hesabınız Yok Mu?</a>
+          <div class="mdl-layout-spacer"></div>
+          <button class="mdl-button mdl-js-button mdl-button--raised color--light-blue"
+                  type="submit" [disabled]="loginForm.invalid">
+            Giriş Yap
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

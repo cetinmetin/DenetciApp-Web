@@ -1,0 +1,119 @@
+<ngx-spinner
+  bdColor="rgba(51,51,51,0.8)"
+  size="medium"
+  color="#fff"
+  type="ball-scale-multiple"
+>
+  <p style="font-size: 20px; color: white">Yükleniyor...</p>
+</ngx-spinner>
+<div class="mdl-cell mdl-cell--12-col-desktop mdl-cell--12-col-tablet mdl-cell--4-col-phone">
+  <base-card style="background-color: white;">
+    <base-card-title>
+      <h1 class="mdl-card__title-text">Yapılan Raporlamalar</h1>
+      <div class="mdl-layout-spacer"></div>
+    </base-card-title>
+    <button type="button" (click)="downloadAsPDF()" class="btn btn-primary" style="border-radius: 0%;padding: 1%;">
+      RAPORLARI PDF OLARAK İNDİR</button>
+    <base-card-body class="no-padding" style="align-self: center;">
+      <mat-form-field>
+        <mat-label>Filtre</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Örn. Metin" #input style="color: black;">
+      </mat-form-field>
+
+      <div class="mat-elevation-z8">
+        <table id="my-table" mat-table [dataSource]="dataSource" matSort multiTemplateDataRows>
+
+          <ng-container matColumnDef="{{column}}" *ngFor="let column of columnsToDisplay; let i = index">
+            <th mat-header-cell *matHeaderCellDef> {{column}} </th>
+            <td mat-cell *matCellDef="let element"> {{element[columnsForGetData[i]]}} </td>
+          </ng-container>
+          <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
+          <ng-container matColumnDef="expandedDetail">
+            <td mat-cell *matCellDef="let element" [attr.colspan]="columnsForReports.length">
+              <div class="example-element-detail row"
+                [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+                <table [datasource]="getData(element)" class="table table-striped" style="background-color: lavender;">
+                  <thead>
+                    <tr>
+                      <th scope="col" *ngFor="let column of columnsForReports">{{column}}</th>
+                    </tr>
+                  </thead>
+                  <tbody *ngFor="let question of element.questions; let i = index">
+                    <tr>
+                      <td> {{question}} </td>
+                      <td> {{element.answers[i]}} </td>
+                      <td>
+                        <img (click)="openImageInNewTab(element.photos[i])" onmouseover="this.style.cursor='hand'"
+                          onmouseout="this.style.cursor='pointer'" class="md-avatar"
+                          *ngIf="element?.photos && element.photos[i]" src={{element.photos[i]}}
+                          style="height:100px!important;width:100px!important;display: block;border-radius: 10%;" />
+                        <!-- <button *ngIf="element?.photos && element.photos[i]" type="button"
+                          (click)="openImageInNewTab(element.photos[i])" class="btn btn-info">Fotoğraf
+                          İçin Tıklayın</button> -->
+                      </td>
+                      <td>
+                        <video (click)="openImageInNewTab(element.videos[i])" onmouseover="this.style.cursor='hand'"
+                          onmouseout="this.style.cursor='pointer'" *ngIf="element?.videos && element.videos[i]"
+                          style="height:100px!important;width:100px!important;display: block;border-radius: 10%;"
+                          class="md-avatar">
+                          <source src="{{element.videos[i]}}" type="video/mp4">
+                        </video>
+                        <!-- <button *ngIf="element?.videos && element.videos[i]" type="button"
+                          (click)="openImageInNewTab(element.videos[i])" class="btn btn-info">Video
+                          İçin Tıklayın</button> -->
+                      </td>
+                      <td>
+                        <audio *ngIf="element?.audios && element.audios[i]" controls>
+                          <source src="{{element.audios[i]}}" type="audio/mpeg">
+                        </audio>
+                        <!-- <button *ngIf="element?.audios && element.audios[i]" type="button"
+                          (click)="openImageInNewTab(element.audios[i])" class="btn btn-info">Ses
+                          İçin Tıklayın</button> -->
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <!-- Address and signature table -->
+                <table class="table table-striped" style="background-color: lavender;">
+                  <thead>
+                    <tr>
+                      <th scope="col" *ngFor="let column of columnsForSignatureAndAddress">{{column}}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <img (click)="openImageInNewTab(element.signature[0])" class="md-avatar"
+                          onmouseover="this.style.cursor='hand'" onmouseout="this.style.cursor='pointer'"
+                          *ngIf="element?.signature && element.signature[0]" src={{element.signature[0]}}
+                          style="height:100px!important;width:100px!important;display: block;border-radius: 10%;" />
+                        <!-- <button *ngIf="element?.signature && element.signature[0]" type="button"
+                          (click)="openImageInNewTab(element.signature[0])" class="btn btn-info">İmza
+                          İçin Tıklayın</button> -->
+                      </td>
+                      <td> {{element["reportAddress"]}} </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+          <tr mat-row *matRowDef="let element; columns: columnsToDisplay;" class="example-element-row"
+            [class.example-expanded-row]="expandedElement === element"
+            (click)="expandedElement = expandedElement === element ? null : element">
+          </tr>
+          <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+
+          <!-- Row shown when there is no matching data. -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="4">Filtre ile eşleşen veri bulunamadı: "{{input.value}}"</td>
+          </tr>
+        </table>
+
+        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+      </div>
+    </base-card-body>
+  </base-card>
+</div>

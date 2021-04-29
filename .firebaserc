@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "denetciapp": {
+      "hosting": {
+        "denetciapp-web": [
+          "denetciapp"
+        ]
+      }
+    }
+  }
+}
