@@ -160,16 +160,16 @@ export class ReportsComponent extends BlankLayoutCardComponent implements OnInit
       + this.officerInformationsForGetData[index].reportDate.split(' Tarihli')[0] + '/' + dataType + '/').listAll();
   }
 
-  firebaseStorageGetDownloadUrl = async (indexReportDate, dataType, max) => {
+  firebaseStorageGetDownloadUrl = async (indexReportDate, dataType, dataList) => {
     let data = []
-    for (let i = 0; i < max; i++) {
+    for (let i = 0; i < dataList.length; i++) {
       data.push(await firebase.storage().ref().child(this.officerInformationsForGetData[indexReportDate].surname
         + ' '
         + this.officerInformationsForGetData[indexReportDate].name
         + ' '
         + this.officerInformationsForGetData[indexReportDate].identityNumber + '/'
         + this.officerInformationsForGetData[indexReportDate].reportDate.split(' Tarihli')[0]
-        + '/' + dataType + (i + 1)).getDownloadURL())
+        + '/' + dataType + dataList[i].name).getDownloadURL())
     }
     return data
   }
@@ -192,18 +192,17 @@ export class ReportsComponent extends BlankLayoutCardComponent implements OnInit
       const videoList = await this.firebaseStorageConnection("videos", j)
       const audioList = await this.firebaseStorageConnection("audios", j)
       const signature = await this.firebaseStorageConnection("signature", j)
-
       for (let i = 0; i < photoList.items.length; i++) {
-        this.photos[j] = (await this.firebaseStorageGetDownloadUrl(j, 'photos/foto', photoList.items.length))
+        this.photos[j] = (await this.firebaseStorageGetDownloadUrl(j, "photos/", photoList.items))
       }
       for (let i = 0; i < videoList.items.length; i++) {
-        this.videos[j] = (await this.firebaseStorageGetDownloadUrl(j, 'videos/video', videoList.items.length))
+        this.videos[j] = (await this.firebaseStorageGetDownloadUrl(j, "videos/", videoList.items))
       }
       for (let i = 0; i < audioList.items.length; i++) {
-        this.audios[j] = (await this.firebaseStorageGetDownloadUrl(j, 'audios/audio', audioList.items.length))
+        this.audios[j] = (await this.firebaseStorageGetDownloadUrl(j, "audios/", audioList.items))
       }
       for (let i = 0; i < signature.items.length; i++) {
-        this.signatures[j] = (await this.firebaseStorageGetDownloadUrl(j, 'signature/signature', signature.items.length))
+        this.signatures[j] = (await this.firebaseStorageGetDownloadUrl(j, "signature/", signature.items))
       }
     }
   }
