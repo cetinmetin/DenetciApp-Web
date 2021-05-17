@@ -1,4 +1,4 @@
-import { Component, HostBinding, AfterViewInit, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { Component, HostBinding, AfterViewInit, ViewChild, ElementRef, OnInit, Injectable } from '@angular/core';
 import { UpgradableComponent } from 'theme/components/upgradable';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { MatPaginator } from '@angular/material/paginator';
@@ -12,6 +12,10 @@ import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { NgxSpinnerService } from "ngx-spinner";
 import { BlankLayoutCardComponent } from 'app/components/blank-layout-card';
+import * as JSZip from 'jszip';
+import JSZipUtils from 'jszip-utils/dist/jszip-utils.js';
+import saveAs from "jszip/vendor/FileSaver.js";
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-reports',
@@ -25,7 +29,7 @@ import { BlankLayoutCardComponent } from 'app/components/blank-layout-card';
     ]),
   ],
 })
-
+@Injectable()
 export class ReportsComponent extends BlankLayoutCardComponent implements OnInit {
 
   columnsToDisplay = ['İsim', 'Soyisim', 'TC Kimlik No', 'Rapor Tarihi', 'Pozisyon'];
@@ -60,7 +64,7 @@ export class ReportsComponent extends BlankLayoutCardComponent implements OnInit
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private spinner: NgxSpinnerService) {
+  constructor(private spinner: NgxSpinnerService, private httpClient: HttpClient) {
     super();
     this.getReportsAndOfficerInformations().then(() => {
       this.retrieveDataFromFirebaseStorage().then(() => {
@@ -93,7 +97,6 @@ export class ReportsComponent extends BlankLayoutCardComponent implements OnInit
         videos: this.videos[index], signature: this.signatures[index], audios: this.audios[index]
       })
     })
-    console.log(this.reportInformations)
     this.dataSource = new MatTableDataSource(this.reportInformations);
   }
   // fillQuestionsAndAnswers = () => {
@@ -123,6 +126,7 @@ export class ReportsComponent extends BlankLayoutCardComponent implements OnInit
 
   downloadAsPDF() {
     var doc = new jsPDF('p', 'mm', 'a3')
+    const downloadUrlsOfAssets = []
     for (let i = 0; i < this.reportInformations.length; i++) {
       autoTable(doc, {
         head: [
@@ -144,11 +148,69 @@ export class ReportsComponent extends BlankLayoutCardComponent implements OnInit
             ],
           ],
         })
+        //for download urls of assets
+        if (this.photos[i][j] != undefined) {
+          downloadUrlsOfAssets[i] = downloadUrlsOfAssets[i] || [];
+          downloadUrlsOfAssets[i].push(this.photos[i][j])
+        }
+
+        if (this.videos[i][j] != undefined) {
+          downloadUrlsOfAssets[i] = downloadUrlsOfAssets[i] || [];
+          downloadUrlsOfAssets[i].push(this.videos[i][j])
+        }
+
+        if (this.audios[i][j] != undefined) {
+          downloadUrlsOfAssets[i] = downloadUrlsOfAssets[i] || [];
+          downloadUrlsOfAssets[i].push(this.audios[i][j])
+        }
+
+        if (this.signatures[i][j] != undefined) {
+          downloadUrlsOfAssets[i] = downloadUrlsOfAssets[i] || [];
+          downloadUrlsOfAssets[i].push(this.signatures[i][j])
+        }
       }
     }
-    doc.save('Raporlamalar.pdf')
+    this.zipAndDownloadAssets(downloadUrlsOfAssets, doc)
   }
-
+  zipAndDownloadAssets = (downloadUrlsOfAssets, reportPdf) => {
+    var zip = new JSZip();
+    var count = 0;
+    var counterOfAssets = 0;
+    var zipFilename = "Raporlamalar.zip";
+    for (let i = 0; i < this.reportInformations.length; i++) {
+      counterOfAssets += downloadUrlsOfAssets[i].length
+      for (let j = 0; j < downloadUrlsOfAssets[i].length; j++) {
+        this.httpClient.get(downloadUrlsOfAssets[i][j], { responseType: 'blob' }).subscribe(response => {
+          var filename = firebase.storage().refFromURL(downloadUrlsOfAssets[i][j]).name
+          // for adding file extensions to filename
+          if (response.type === 'image/jpeg') {
+            filename += '.jpeg'
+            zip.file((i + 1) + ".Rapor/Fotoğraflar/" + filename, response, { binary: true });
+          }
+          else if (response.type === 'audio/mpeg') {
+            filename += '.mpeg'
+            zip.file((i + 1) + ".Rapor/Sesler/" + filename, response, { binary: true });
+          }
+          else if (response.type === 'video/mp4') {
+            filename += '.mp4'
+            zip.file((i + 1) + ".Rapor/Videolar/" + filename, response, { binary: true });
+          }
+          else if (response.type === 'image/png') {
+            filename += '.png'
+            zip.file((i + 1) + ".Rapor/İmzalar/" + filename, response, { binary: true });
+          }
+          count++;
+          if (count == counterOfAssets) {
+            this.spinner.show();
+            zip.file('Rapor.pdf', reportPdf.output('blob'));
+            zip.generateAsync({ type: 'blob' }).then(function (content) {
+              saveAs(content, zipFilename);
+            }).then(() => this.spinner.hide())
+          }
+        })
+      }
+    }
+  }
   firebaseStorageConnection = async (dataType, index) => {
 
     const surnameNameIdentityNumber = this.officerInformationsForGetData[index].surname
@@ -246,7 +308,7 @@ export class ReportsComponent extends BlankLayoutCardComponent implements OnInit
     }
   }
 
-  ngOnInit():void {
+  ngOnInit(): void {
     this.spinner.show();
   }
 
