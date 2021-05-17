@@ -20,8 +20,7 @@
         <input matInput (keyup)="applyFilter($event)" placeholder="Örn. Metin" #input style="color: black;">
       </mat-form-field>
 
-      <div class="mat-elevation-z8">
-        <table id="my-table" mat-table [dataSource]="dataSource" matSort multiTemplateDataRows>
+        <table class="table-responsive" id="my-table" mat-table [dataSource]="dataSource" matSort multiTemplateDataRows>
 
           <ng-container matColumnDef="{{column}}" *ngFor="let column of columnsToDisplay; let i = index">
             <th mat-header-cell *matHeaderCellDef> {{column}} </th>
@@ -113,7 +112,6 @@
         </table>
 
         <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
-      </div>
     </base-card-body>
   </base-card>
 </div>
