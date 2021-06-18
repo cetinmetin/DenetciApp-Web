@@ -1,1 +1,116 @@
-<p>questions works!</p>
+<ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-scale-multiple">
+    <p style="font-size: 20px; color: white">Yükleniyor...</p>
+</ngx-spinner>
+<div class="mdl-cell mdl-cell--12-col-desktop mdl-cell--12-col-tablet mdl-cell--4-col-phone">
+    <base-card style="background-color: white;">
+        <base-card-title>
+            <h1 class="mdl-card__title-text">Soru İşlemleri</h1>
+            <div class="mdl-layout-spacer"></div>
+        </base-card-title>
+        <base-card-body class="no-padding" style="align-self: center;">
+            <div *ngIf="questionsAdminForm" [formGroup]="questionsAdminForm">
+                <div formArrayName="forms">
+                    <form class="text-center border border-light p-5" *ngFor="let form of forms.controls; let i=index"
+                        [formGroupName]="i" style="margin-top: 2%;">
+                        <div class="button-group row" style="float: right;margin-bottom: 1%;">
+                            <button type="button" class="btn btn-primary" data-mdb-toggle="button" autocomplete="off"
+                                name="active{{i}}" (click)="answerMethods[i].status = !answerMethods[i].status"
+                                mdbWavesEffect>Soru
+                                Aktifliği
+                                <mdb-icon style="left: 5%;" *ngIf="answerMethods[i].status" fas icon="check">
+                                </mdb-icon>
+                                <mdb-icon style="left: 5%;" *ngIf="!answerMethods[i].status" fas icon="times">
+                                </mdb-icon>
+                            </button>
+                            <button class="btn btn-primary" type="button" (click)="deleteQuestion(i)"
+                                mdbWavesEffect>Soruyu Sil
+                                <mdb-icon far icon="trash-alt"></mdb-icon>
+                            </button>
+                            <button class="btn btn-primary" type="button" (click)="questionUp(i)" mdbWavesEffect>Soru
+                                Yukarı
+                                <mdb-icon fas icon="arrow-up"></mdb-icon>
+                            </button>
+                            <button class="btn btn-primary" type="button" (click)="questionDown(i)" mdbWavesEffect>Soru
+                                Aşağı
+                                <mdb-icon fas icon="arrow-down"></mdb-icon>
+                            </button>
+                        </div>
+                        <div class="question-label" style="float: left;margin-top: 1%;">
+                            <p class="h4 mb-4" style="color: black;">Soru {{i+1}}</p>
+                        </div>
+                        <input type="text" name=question{{i}} (blur)="onChange($event.target.value,i)" id=question{{i}}
+                            class="form-control mb-4" formControlName="questionsForm" required>
+                        <p style="color: black;font-weight: bold;">Cevaplandırma Yöntemi</p>
+                        <div class="row justify-content-center">
+                            <div class="row">
+                                <div class="col">
+                                    <mat-checkbox class="btn-block" name=text{{i}} id=text{{i}}
+                                        labelPosition="labelPosition" [checked]="answerMethods[i].text"
+                                        (change)="onChangeOfCheckboxes('text',i)" style="color: black;" color="primary">
+                                        Metin/Rakam
+                                    </mat-checkbox>
+                                </div>
+                                <div class="col">
+                                    <mat-checkbox class="btn-block" name=voice{{i}} id=voice{{i}}
+                                        labelPosition="labelPosition" [checked]="answerMethods[i].voice"
+                                        (change)="onChangeOfCheckboxes('voice',i)" style="color: black;"
+                                        color="primary">
+                                        Ses
+                                    </mat-checkbox>
+                                </div>
+                                <div class="col">
+                                    <mat-checkbox class="btn-block" name=photo{{i}} id=photo{{i}}
+                                        labelPosition="labelPosition" [checked]="answerMethods[i].photo"
+                                        (change)="onChangeOfCheckboxes('photo',i)" style="color: black;"
+                                        color="primary">
+                                        Fotoğraf
+                                    </mat-checkbox>
+                                </div>
+                                <div class="col">
+                                    <mat-checkbox class="btn-block" name=video{{i}} id=video{{i}}
+                                        labelPosition="labelPosition" [checked]="answerMethods[i].video"
+                                        (change)="onChangeOfCheckboxes('video',i)" style="color: black;"
+                                        color="primary">
+                                        Video
+                                    </mat-checkbox>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <br />
+            <form class="text-center border border-light p-5" *ngIf="questions.length > 0">
+                <div class="col">
+                    <div class="col">
+                        <p style="color: black;font-weight: bold;">İmza ve Konum Bilgisi</p>
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="row">
+                            <div class="col">
+                                <mat-checkbox class="btn-block" name="signature" labelPosition="labelPosition"
+                                    [checked]="haveSignature" (change)="onChangeOfCheckboxes('signature') "
+                                    style="color: black;" color="primary">
+                                    İmza Gerekli
+                                </mat-checkbox>
+                            </div>
+                            <div class="col">
+                                <mat-checkbox class="btn-block" name="location" labelPosition="labelPosition"
+                                    [checked]="haveLocation" (change)="onChangeOfCheckboxes('location')"
+                                    style="color: black;" color="primary">
+                                    Konum Gerekli
+                                </mat-checkbox>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="form-group text-center">
+                <button mdbBtn color="info" block="true" class="my-4" type="submit" (click)="addQuestion()">Soru
+                    Ekle</button>
+                <button mdbBtn color="info" block="true" class="my-4" type="submit"
+                    (click)="updateQuestions(questions, answerMethods)">Soruları Kaydet/Güncelle</button>
+            </div>
+        </base-card-body>
+    </base-card>
+</div>
