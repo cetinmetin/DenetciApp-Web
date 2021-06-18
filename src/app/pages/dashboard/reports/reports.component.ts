@@ -16,6 +16,8 @@ import * as JSZip from 'jszip';
 import JSZipUtils from 'jszip-utils/dist/jszip-utils.js';
 import saveAs from "jszip/vendor/FileSaver.js";
 import { HttpClient } from '@angular/common/http';
+import { Officer, OfficerInformationsForGetData } from '../../../models/officer'
+import { QuestionsAndAnswers } from '../../../models/questionsAndAnswers'
 
 @Component({
   selector: 'app-reports',
@@ -272,31 +274,4 @@ export class ReportsComponent extends BlankLayoutCardComponent implements OnInit
       this.dataSource.paginator.firstPage();
     }
   }
-}
-
-export interface Officer {
-  name: string;
-  surname: string;
-  identityNumber: number;
-  reportDate: string;
-  position: string;
-  signature: any[];
-  reportAddress: string;
-  questions: any[];
-  answers: any[];
-  photos: any[];
-  videos: any[];
-  audios: any[];
-}
-
-export interface OfficerInformationsForGetData {
-  name: string;
-  surname: string;
-  identityNumber: number;
-  reportDate: string
-}
-
-export interface QuestionsAndAnswers {
-  questions: any[];
-  answers: any[];
 }
