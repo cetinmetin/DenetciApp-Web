@@ -10,6 +10,8 @@ import { QuestionsComponent } from './questions/questions.component';
 import { MaterialModule } from './material-module'
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from '@angular/material/form-field';
 import { NgxSpinnerModule } from "ngx-spinner";
+import { MDBBootstrapModule } from 'angular-bootstrap-md';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   imports: [
@@ -17,7 +19,9 @@ import { NgxSpinnerModule } from "ngx-spinner";
     ThemeModule,
     FormsModule,
     MaterialModule,
-    NgxSpinnerModule
+    NgxSpinnerModule,
+    MDBBootstrapModule.forRoot(),
+    ReactiveFormsModule
   ],
   declarations: [
     DashboardComponent,
